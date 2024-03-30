@@ -1,12 +1,16 @@
-import { CartItem } from "../interfaces";
+import { Dispatch, useMemo } from "react";
+import { CartItem } from "../../interfaces";
+import { CartActions } from "../../reducers/cart-reducer";
 
 type HeaderProps = {
-    cart: CartItem[],
-    isEmptyCart: boolean,
-    totalCart: number
+    cart: CartItem[]
+    dispatch: Dispatch<CartActions>
 }
 
-export default function Header({ cart, isEmptyCart, totalCart } : HeaderProps) {
+function Header({ cart, dispatch } : HeaderProps) {
+    // State Derivado
+    const isEmptyCart = useMemo( () => cart.length === 0, [cart])
+    const totalCart = useMemo( () => cart.reduce( (total, item ) => total + (item.quantity * item.price), 0), [cart] )
 
     return (
         <header className="py-5 header">
@@ -18,13 +22,11 @@ export default function Header({ cart, isEmptyCart, totalCart } : HeaderProps) {
                         </a>
                     </div>
                     <nav className="col-md-6 a mt-5 d-flex align-items-start justify-content-end">
-                        <div 
-                            className="carrito"
-                        >
+                        <div className="carrito" >
                             <img className="img-fluid" src="/img/carrito.png" alt="imagen carrito" />
 
                             <div id="carrito" className="bg-white p-3">
-                                {
+                            {
                                     isEmptyCart ? (
                                         <p className="text-center">El carrito esta vacio</p>
                                     ) : (
@@ -40,30 +42,32 @@ export default function Header({ cart, isEmptyCart, totalCart } : HeaderProps) {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {cart.map( guitar => (
-                                                        <tr key={guitar.id}>
+                                                    {cart.map( product => (
+                                                        <tr key={product.id}>
                                                             <td>
                                                                 <img 
                                                                     className="img-fluid" 
-                                                                    src={`/img/${guitar.image}.jpg`}
+                                                                    src={`/img/${product.image}`}
                                                                     alt="imagen guitarra" 
                                                                 />
                                                             </td>
-                                                            <td>{guitar.name}</td>
+                                                            <td>{product.name}</td>
                                                             <td className="fw-bold">
-                                                                ${guitar.price}
+                                                                ${product.price}
                                                             </td>
                                                             <td className="flex align-items-start gap-4">
                                                                 <button
                                                                     type="button"
                                                                     className="btn btn-dark"
+                                                                    onClick={() => dispatch({type: 'decrease-quantity-cart', payload: {id: product.id}})}
                                                                 >
                                                                     -
                                                                 </button>
-                                                                    {guitar.quantity}
+                                                                    {product.quantity}
                                                                 <button
                                                                     type="button"
                                                                     className="btn btn-dark"
+                                                                    onClick={() => dispatch({type: 'increase-quantity-cart', payload: {id: product.id}})}
                                                                 >
                                                                     +
                                                                 </button>
@@ -72,6 +76,7 @@ export default function Header({ cart, isEmptyCart, totalCart } : HeaderProps) {
                                                                 <button
                                                                     className="btn btn-danger"
                                                                     type="button"
+                                                                    onClick={() => dispatch({type: 'remove-from-cart', payload: {id: product.id}})}
                                                                 >
                                                                     X
                                                                 </button>
@@ -82,7 +87,7 @@ export default function Header({ cart, isEmptyCart, totalCart } : HeaderProps) {
                                             </table>
 
                                             <p className="text-end">Total pagar: <span className="fw-bold">${totalCart}</span></p>
-                                            <button className="btn btn-dark w-100 mt-3 p-2">Vaciar Carrito</button>
+                                            <button className="btn btn-dark w-100 mt-3 p-2" onClick={() => dispatch({type: 'clear-cart'})}>Vaciar Carrito</button>
                                         </>
                                     )
                                 }
@@ -94,3 +99,5 @@ export default function Header({ cart, isEmptyCart, totalCart } : HeaderProps) {
         </header>
     );
 }
+
+export default Header;
