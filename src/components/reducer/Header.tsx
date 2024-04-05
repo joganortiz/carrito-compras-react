@@ -1,6 +1,7 @@
 import { Dispatch, useMemo } from "react";
 import { CartItem } from "../../interfaces";
 import { CartActions } from "../../reducers/cart-reducer";
+import { closeAllToasts, notifyToast } from "../../helpers/toast";
 
 type HeaderProps = {
     cart: CartItem[]
@@ -11,6 +12,17 @@ function Header({ cart, dispatch } : HeaderProps) {
     // State Derivado
     const isEmptyCart = useMemo( () => cart.length === 0, [cart])
     const totalCart = useMemo( () => cart.reduce( (total, item ) => total + (item.quantity * item.price), 0), [cart] )
+
+    const clearCart = () => {
+        dispatch({type: 'clear-cart'});
+        closeAllToasts();
+        notifyToast('success', <>Se vacio el carrito</>, 'customId');
+    }
+
+    const removeFromCart = (product: CartItem) => {
+        dispatch({type: 'remove-from-cart', payload: { id: product.id }});
+        notifyToast('success', <>Se elimino el producto <b>{product.name}</b> del carrito</>, 'customId');
+    }
 
     return (
         <header className="py-5 header">
@@ -76,7 +88,7 @@ function Header({ cart, dispatch } : HeaderProps) {
                                                                 <button
                                                                     className="btn btn-danger"
                                                                     type="button"
-                                                                    onClick={() => dispatch({type: 'remove-from-cart', payload: {id: product.id}})}
+                                                                    onClick={() => removeFromCart(product)}
                                                                 >
                                                                     X
                                                                 </button>
@@ -87,7 +99,7 @@ function Header({ cart, dispatch } : HeaderProps) {
                                             </table>
 
                                             <p className="text-end">Total pagar: <span className="fw-bold">${totalCart}</span></p>
-                                            <button className="btn btn-dark w-100 mt-3 p-2" onClick={() => dispatch({type: 'clear-cart'})}>Vaciar Carrito</button>
+                                            <button className="btn btn-dark w-100 mt-3 p-2" onClick={clearCart}>Vaciar Carrito</button>
                                         </>
                                     )
                                 }

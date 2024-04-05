@@ -1,5 +1,4 @@
 import { db } from "../data/db";
-import { notify } from "../helpers/toast";
 import { CartItem, Product } from "../interfaces";
 
 export type CartActions = 
@@ -49,8 +48,6 @@ export const cartReducer = (state: CartState = initialState, action: CartActions
             } else {
                 const newItem : CartItem = {...action.payload.item, quantity : 1}
                 updatedCart = [...state.cart, newItem]
-
-                notify('Agregado al carrito', 'carrito')
             }
     
             return {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { notify } from "../helpers/toast";
+import { notifyToast } from "../helpers/toast";
 
 export const useApp = () => {
     
@@ -12,10 +12,10 @@ export const useApp = () => {
     const [isReducer, setIsReducer] = useState(initialIsReducer);
 
     const handleChange = () => {
+        notifyToast("success", "Se modifico a <b>" + (isReducer ? "By UseHook" : "By Reducer") +"</b>", "customId");
         setIsReducer(!isReducer);
         localStorage.setItem('isReducer', JSON.stringify(!isReducer));
 
-        notify("Se modifico a " + (isReducer ? "By UseHook" : "By Reducer"), "customId");
     }
     
     useEffect(() => {
